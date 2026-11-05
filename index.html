@@ -3,31 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#101b1b">
-  <meta name="description" content="Una misión de tres minutos para reparar, probar y documentar un prototipo embebido. Entra con tu nombre y juega en el navegador.">
-  <title>Protocolo 4.2 · Misión express</title>
+  <meta name="theme-color" content="#101c23">
+  <meta name="description" content="Cristales, cuerda y muñeca: tres minijuegos de preguntas sobre solución y documentación de software embebido.">
+  <title>Protocolo 4.2 · Los tres juegos</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./styles.css?v=2.0">
-  <script src="./core.js?v=2.0" defer></script>
-  <script src="./board.js?v=2.0" defer></script>
-  <script src="./app.js?v=2.0" defer></script>
+  <link rel="stylesheet" href="./styles.css?v=3.0">
+  <script src="./core.js?v=3.0" defer></script>
+  <script src="./app.js?v=3.0" defer></script>
 </head>
-<body>
-  <a class="skip" href="#main">Saltar al contenido</a>
-  <div id="app"></div>
-  <dialog id="help-dialog" aria-labelledby="help-title">
-    <div class="dialog-head"><span class="eyebrow">MANUAL DE CAMPO</span><button class="icon-btn" data-action="close-help" aria-label="Cerrar guía">✕</button></div>
-    <h2 id="help-title">Tres retos. Tres minutos.</h2>
-    <p>Recupera el monitor del laboratorio. Todo se hace pulsando botones; no necesitas escribir código ni arrastrar piezas.</p>
-    <ol class="guide-list">
-      <li><strong>Repara.</strong> Desconecta el sensor, localiza la causa y pulsa la pieza que corrige la lógica.</li>
-      <li><strong>Comprueba.</strong> Ejecuta las cuatro tarjetas de prueba y activa luz y sonido en el puesto del operador.</li>
-      <li><strong>Documenta.</strong> Adjunta dos evidencias que permitan demostrar y repetir la corrección. Sella tu resultado.</li>
-    </ol>
-    <p class="muted">Tienes 100 puntos posibles: 40 por reparar, 30 por comprobar y 30 por documentar. Una decisión incorrecta distinta resta 5 puntos, hasta la mitad del valor del reto. Las pistas son gratuitas. El reloj solo orienta: nadie queda eliminado por tiempo.</p>
-    <p class="muted">Simulación didáctica. Tu nombre y progreso se guardan solo en este navegador, si permite almacenamiento. No se envían a un servidor.</p>
-    <button class="button primary" data-action="close-help">Entendido</button>
-  </dialog>
-  <noscript>Activa JavaScript en tu navegador para abrir el laboratorio. No necesitas instalar ninguna aplicación.</noscript>
-</body>
+<body><a class="skip" href="#main">Saltar al juego</a><div id="app"></div><noscript>Activa JavaScript para jugar. No necesitas instalar nada.</noscript></body>
 </html>

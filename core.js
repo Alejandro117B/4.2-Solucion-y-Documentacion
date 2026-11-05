@@ -1,110 +1,63 @@
-/* Motor de la misión express. JavaScript estándar, sin red ni dependencias. */
-(function (root) {
+/* Reglas y preguntas del juego. Sin servicios externos. */
+(function(root){
   'use strict';
-  const PHASES = [
-    {title:'Reparar',points:40,time:'45–60 s'},
-    {title:'Comprobar',points:30,time:'45–60 s'},
-    {title:'Documentar',points:30,time:'30–45 s'}
+  const LIMIT=60000;
+  const LEVELS=[
+    {name:'Puente de cristal',icon:'◇',max:30,rule:'Elige el cristal con la respuesta correcta. Un error rompe el piso y termina este nivel.',questions:[
+      {text:'¿Qué haces primero cuando un prototipo falla?',options:['Identificar qué está fallando','Cambiar código al azar'],correct:0,why:'Primero se detecta el problema. Después se reproduce, se diagnostica y se corrige.'},
+      {text:'La alarma se activa con datos inválidos. ¿Qué arreglo ataca la causa?',options:['Esperar más tiempo entre lecturas','Validar la lectura del sensor'],correct:1,why:'Validar evita usar datos inválidos. Un retardo solo puede ocultar el síntoma.'},
+      {text:'¿Qué ayuda a otra persona a repetir una corrección?',options:['Guardar la versión y las pruebas','Anotar solamente «ya funciona»'],correct:0,why:'La versión, el procedimiento y los resultados permiten repetir y comprobar la solución.'}
+    ]},
+    {name:'Tira de la cuerda',icon:'↔',max:40,rule:'Un acierto tira a tu favor; un error favorece al rival. Con dos puntos de ventaja ganas. Máximo 5 preguntas.',questions:[
+      {text:'Verificar una alarma significa…',options:['Medir si cumple el requisito técnico','Elegir el color de la carcasa'],correct:0,why:'Verificar es comprobar requisitos técnicos con resultados medibles.'},
+      {text:'Validar esa alarma significa…',options:['Revisar únicamente si compila','Comprobar que alerta al operador'],correct:1,why:'Validar comprueba que la solución sirve en su escenario real de uso.'},
+      {text:'Si una prueba falla, ¿qué corresponde hacer?',options:['Volver al diagnóstico y corregir','Dar el prototipo por terminado'],correct:0,why:'El ciclo es iterativo: una prueba fallida lleva de nuevo al diagnóstico.'},
+      {text:'¿Qué debe incluir una documentación útil?',options:['Solo una captura del programa','Requisitos, cambios y pruebas'],correct:1,why:'Una documentación útil conserva requisitos, decisiones, cambios y evidencia de prueba.'},
+      {text:'¿Qué conecta la trazabilidad?',options:['Requisito, código, prueba y evidencia','Solo los nombres del equipo'],correct:0,why:'La trazabilidad muestra qué implementación y qué prueba demuestran cada requisito.'}
+    ]},
+    {name:'Luz roja, luz verde',icon:'○',max:30,rule:'Responde dos preguntas. Si aciertas, avanzas y sobrevives cuando la muñeca voltea. Si fallas, te elimina de este nivel.',questions:[
+      {text:'El requisito dice T > 30 °C. A exactamente 30 °C, la alarma debe…',options:['Permanecer apagada','Encenderse'],correct:0,why:'El símbolo > significa mayor que. Exactamente 30 °C todavía no supera el umbral.'},
+      {text:'El sensor se desconecta y llega un dato inválido. El firmware debe…',options:['Compararlo como si fuera válido','Descartarlo y mostrar ERROR'],correct:1,why:'Primero se comprueba la validez. Un dato inválido no debe activar una falsa alarma de temperatura.'}
+    ]}
   ];
-  const CASES = [
-    {id:'normal',label:'Normal',temp:25,connected:true,expected:'NORMAL'},
-    {id:'boundary',label:'Frontera',temp:30,connected:true,expected:'NORMAL'},
-    {id:'high',label:'Temperatura alta',temp:31,connected:true,expected:'ALARMA'},
-    {id:'offline',label:'Desconexión',temp:25,connected:false,expected:'ERROR'}
-  ];
-  const FIXES = [
-    {id:'delay',code:'DLY',title:'Esperar 3 segundos',detail:'Añadir una pausa antes de comparar.'},
-    {id:'validate',code:'CHK',title:'Validar la lectura',detail:'Si valid=false, emitir ERROR y no comparar.'},
-    {id:'off',code:'OFF',title:'Apagar siempre la alarma',detail:'Evitar cualquier encendido de la salida.'}
-  ];
-  const EVIDENCE = [
-    {id:'vague',code:'NOTA',title:'«Ya funciona»',detail:'Mensaje del equipo, sin mediciones.'},
-    {id:'log',code:'CSV',title:'Registro de las 4 pruebas',detail:'Valores, estados y 120 ms en el caso de alarma.'},
-    {id:'photo',code:'IMG',title:'Foto del LED encendido',detail:'Sin valor de entrada ni versión del firmware.'},
-    {id:'version',code:'FW',title:'Firmware v1.1 + cambio',detail:'Validación del sensor antes de comparar T.'}
-  ];
-  function simulate(temp, connected, repaired) {
-    const value=connected?Number(temp):85,valid=!!connected;
-    const state=repaired&&!valid?'ERROR':value>30?'ALARMA':'NORMAL';
-    return {value,valid,state,alarm:state==='ALARMA',latency:120};
+  function create(name,now=Date.now()){return {v:3,name:String(name).trim().replace(/\s+/g,' ').slice(0,40),level:0,index:0,status:'playing',started:now,deadline:now+LIMIT,finished:null,flash:null,rounds:LEVELS.map(()=>({correct:0,wrong:0,balance:0,won:false,finished:false,reason:'',path:[],last:null}))};}
+  function end(s,won,reason){Object.assign(s.rounds[s.level],{won,finished:true,reason});s.status='round-end';s.flash=null;}
+  function answer(s,choice,now=Date.now()){
+    if(s.status!=='playing'||s.flash||![0,1].includes(choice))return false;
+    if(now>=s.deadline){tick(s,now);return false;}
+    const q=LEVELS[s.level].questions[s.index],r=s.rounds[s.level],correct=choice===q.correct;
+    r[correct?'correct':'wrong']++;r.balance+=correct?1:-1;r.last={index:s.index,choice,correct};r.path.push({choice,correct});
+    let finish=false,won=false,reason='';
+    if(s.level===0){finish=!correct||r.correct===3;won=r.correct===3;reason=won?'Cruzaste los tres cristales.':'Elegiste el cristal incorrecto.';}
+    if(s.level===1){finish=Math.abs(r.balance)>=2||s.index===4;won=r.balance>0;reason=won?'Tu equipo ganó el tirón.':'El equipo rival ganó el tirón.';}
+    if(s.level===2){finish=!correct||r.correct===2;won=r.correct===2;reason=won?'Llegaste a la meta sin que la muñeca te eliminara.':'La muñeca volteó y te eliminó.';}
+    s.flash={correct,until:now+1100,finish,won,reason};return true;
   }
-  function create(name,now=Date.now()) {
-    return {v:2,name:String(name).trim().replace(/\s+/g,' ').slice(0,48),phase:0,started:now,finished:null,
-      completed:[false,false,false],mistakes:[0,0,0],hints:[false,false,false],rejected:[],
-      reproduced:false,source:null,fix:null,tests:[],light:false,sound:false,evidence:[]};
-  }
-  function points(phase,mistakes) { const max=PHASES[phase].points;return max-Math.min(max/2,Math.max(0,mistakes)*5); }
-  function score(s) { return PHASES.reduce((sum,_,i)=>sum+points(i,s.mistakes[i]),0); }
-  function ready(s) {
-    if(s.phase===0)return s.reproduced&&s.source==='firmware'&&s.fix==='validate';
-    if(s.phase===1)return s.tests.length===4&&s.light&&s.sound;
-    if(s.phase===2)return s.evidence.includes('log')&&s.evidence.includes('version');
+  function tick(s,now=Date.now()){
+    if(s.status!=='playing')return false;
+    if(s.flash&&(now>=s.flash.until||now>=s.deadline)){
+      const f=s.flash;s.flash=null;
+      if(f.finish){end(s,f.won,f.reason);return true;}
+      s.index++;
+      if(now<s.deadline)return true;
+    }
+    if(now>=s.deadline){const won=s.level===1&&s.rounds[1].balance>0;end(s,won,won?'Se acabó el tiempo con la cuerda a tu favor.':'Se acabó el minuto de este nivel.');return true;}
     return false;
   }
-  function valid(s) {
-    const bools=a=>Array.isArray(a)&&a.length===3&&a.every(x=>typeof x==='boolean');
-    const unique=(a,allowed)=>Array.isArray(a)&&a.length<=allowed.length&&new Set(a).size===a.length&&a.every(x=>allowed.includes(x));
-    if(!s||s.v!==2||typeof s.name!=='string'||!s.name.trim()||s.name.length>48||!Number.isInteger(s.phase)||s.phase<0||s.phase>3||!Number.isFinite(s.started)||s.started<=0)return false;
-    if(!bools(s.completed)||!bools(s.hints)||!Array.isArray(s.mistakes)||s.mistakes.length!==3||!s.mistakes.every(n=>Number.isInteger(n)&&n>=0))return false;
-    if(!Array.isArray(s.rejected)||s.rejected.length>10||!s.rejected.every(x=>typeof x==='string'))return false;
-    if(!['reproduced','light','sound'].every(k=>typeof s[k]==='boolean')||![null,'firmware'].includes(s.source)||![null,'validate'].includes(s.fix))return false;
-    if(!unique(s.tests,CASES.map(c=>c.id))||!unique(s.evidence,['log','version']))return false;
-    if(!s.completed.every((done,i)=>done===(i<s.phase)))return false;
-    if(s.phase>=1&&(!s.reproduced||s.source!=='firmware'||s.fix!=='validate'))return false;
-    if(s.phase>=2&&(s.tests.length!==4||!s.light||!s.sound))return false;
-    if(s.phase===3&&(s.evidence.length!==2||!Number.isFinite(s.finished)||s.finished<s.started))return false;
+  function next(s,now=Date.now()){
+    if(s.status!=='round-end')return false;
+    if(s.level===2){s.status='finished';s.finished=Math.max(now,s.started);return true;}
+    s.level++;s.index=0;s.status='playing';s.flash=null;s.deadline=now+LIMIT;return true;
+  }
+  function points(s,i){const r=s.rounds[i];if(i===0)return r.correct*10;if(i===2)return r.correct*15;return r.won?Math.max(10,40-r.wrong*10):Math.min(20,r.correct*5);}
+  function score(s){return LEVELS.reduce((n,_,i)=>n+points(s,i),0);}
+  function valid(s){
+    if(!s||s.v!==3||typeof s.name!=='string'||!s.name.trim()||s.name.length>40||!Number.isInteger(s.level)||s.level<0||s.level>2||!['playing','round-end','finished'].includes(s.status)||!Number.isFinite(s.started)||!Number.isFinite(s.deadline))return false;
+    if(!Number.isInteger(s.index)||s.index<0||s.index>=LEVELS[s.level].questions.length||!Array.isArray(s.rounds)||s.rounds.length!==3)return false;
+    if(!s.rounds.every((r,i)=>r&&Number.isInteger(r.correct)&&r.correct>=0&&Number.isInteger(r.wrong)&&r.wrong>=0&&r.correct+r.wrong<=LEVELS[i].questions.length&&Number.isInteger(r.balance)&&typeof r.won==='boolean'&&typeof r.finished==='boolean'&&typeof r.reason==='string'&&Array.isArray(r.path)&&r.path.length===r.correct+r.wrong&&r.path.every(p=>p&&[0,1].includes(p.choice)&&typeof p.correct==='boolean')&&(r.last===null||(Number.isInteger(r.last.index)&&r.last.index>=0&&r.last.index<LEVELS[i].questions.length&&[0,1].includes(r.last.choice)&&typeof r.last.correct==='boolean'))))return false;
+    if(s.flash!==null&&(!s.flash||typeof s.flash.correct!=='boolean'||!Number.isFinite(s.flash.until)||typeof s.flash.finish!=='boolean'||typeof s.flash.won!=='boolean'||typeof s.flash.reason!=='string'))return false;
+    if(s.status==='finished'&&(s.level!==2||!s.rounds.every(r=>r.finished)||!Number.isFinite(s.finished)))return false;
     return true;
   }
-  function act(s,a,now=Date.now()) {
-    if(s.phase===3)return {message:'La misión ya está completa.',kind:'info'};
-    const message=(text,kind='info')=>({message:text,kind});
-    const wrong=(key,text)=>{
-      if(!s.rejected.includes(key)){s.rejected.push(key);s.mistakes[s.phase]++;}
-      return message(text,'warning');
-    };
-    if(a.type==='hint'){s.hints[s.phase]=true;return message('Pista abierta. Consultarla no resta puntos.');}
-    if(a.type==='advance'){
-      if(!ready(s))return message('Completa las acciones resaltadas antes de continuar. No se descuentan puntos.','warning');
-      s.completed[s.phase]=true;s.phase++;
-      if(s.phase===3)s.finished=Math.max(now,s.started);
-      return message('Estación recuperada.','success');
-    }
-    if(s.phase===0){
-      if(a.type==='reproduce'){s.reproduced=true;return message('Fallo reproducido: el ambiente sigue a 25 °C, pero un dato inválido enciende la alarma.','success');}
-      if(a.type==='source'){
-        if(!s.reproduced)return message('Primero pulsa «Desconectar sensor».','warning');
-        if(a.id==='firmware'){s.source='firmware';return message('Causa localizada: el firmware ignora valid=false y compara el 85 de sustitución.','success');}
-        if(a.id==='sensor')return wrong('source-sensor','El sensor avisa valid=false. El fallo está en quien utiliza el valor sin comprobar esa bandera.');
-        if(a.id==='output')return wrong('source-output','La salida cumple la orden que recibe. Sigue el dato hasta la lógica que decide encenderla.');
-      }
-      if(a.type==='fix'){
-        if(s.source!=='firmware')return message('Localiza primero el componente que interpreta mal el dato.','warning');
-        if(a.id==='validate'){s.fix='validate';return message('Corrección aplicada: el dato inválido produce ERROR y la alarma de temperatura se apaga.','success');}
-        if(a.id==='delay')return wrong('fix-delay','El retardo solo retrasa el mismo error. La corrección debe comprobar si el dato es válido.');
-        if(a.id==='off')return wrong('fix-off','Apagar siempre también impediría avisar ante calor real. Necesitas conservar la alarma para datos válidos.');
-      }
-    }
-    if(s.phase===1){
-      if(a.type==='test'){
-        const c=CASES.find(c=>c.id===a.id);if(!c)return message('Caso desconocido.','warning');
-        if(!s.tests.includes(c.id))s.tests.push(c.id);
-        const r=simulate(c.temp,c.connected,true);
-        return message(`${c.label}: ${r.state}. ${c.id==='high'?'120 ms, dentro del límite de 2 s.':c.id==='boundary'?'30 °C no supera el umbral.':c.id==='offline'?'Dato inválido descartado, alarma apagada.':'Temperatura normal, alarma apagada.'}`,'success');
-      }
-      if(a.type==='light')s.light=!s.light;
-      else if(a.type==='sound')s.sound=!s.sound;
-      else return message('Acción no disponible.');
-      return message(s.light&&s.sound?'Validación registrada: el operador percibe el aviso combinado.':'Activa luz y sonido para avisar al operador en este escenario.',s.light&&s.sound?'success':'info');
-    }
-    if(s.phase===2&&a.type==='evidence'){
-      if(['log','version'].includes(a.id)){
-        if(!s.evidence.includes(a.id))s.evidence.push(a.id);
-        return message(a.id==='log'?'Pruebas adjuntas: queda registrado cómo se comprobó el cambio.':'Versión adjunta: otra persona sabrá qué firmware repetir.','success');
-      }
-      if(a.id==='vague')return wrong('evidence-vague','«Ya funciona» no indica qué se probó ni qué resultado se obtuvo. Adjunta un registro medible.');
-      if(a.id==='photo')return wrong('evidence-photo','La foto sola no demuestra el umbral ni permite repetir la corrección. Faltan condiciones y versión.');
-    }
-    return message('Acción no disponible en esta estación.');
-  }
-  root.Lab=Object.freeze({PHASES,CASES,FIXES,EVIDENCE,simulate,create,points,score,ready,valid,act});
-})(typeof window!=='undefined'?window:globalThis);
+  root.Squid=Object.freeze({LIMIT,LEVELS,create,answer,tick,next,points,score,valid});
+})(typeof window==='undefined'?globalThis:window);

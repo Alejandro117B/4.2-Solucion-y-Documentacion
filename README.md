@@ -1,55 +1,39 @@
-# Protocolo 4.2 · Misión express
+# Protocolo 4.2 · Los tres juegos
 
-**[Abrir el juego](https://alejandro117b.github.io/4.2-Solucion-y-Documentacion/)**
+## [Jugar en el navegador](https://alejandro117b.github.io/4.2-Solucion-y-Documentacion/)
 
-Actividad individual de aproximadamente **3 minutos**, basada en la presentación **4.2 Solución y documentación**, de Software Embebido. Cada participante abre el enlace, escribe su nombre y juega directamente en su navegador. No instala nada, no necesita cuenta de GitHub y no tiene que descargar el código.
+Actividad individual inspirada en los juegos del cristal, la cuerda y la muñeca. Las preguntas se basan en **4.2 Solución y documentación de software embebido**. Cada persona escribe su nombre y juega directamente desde el enlace. No instala nada ni necesita cuenta de GitHub.
 
-## Tres retos
+## Cómo se juega
 
-1. **Reparar, 45–60 s:** reproducir la desconexión, localizar la causa e insertar la validación que falta.
-2. **Comprobar, 45–60 s:** ejecutar cuatro pruebas rápidas y activar luz y sonido para validar el aviso al operador.
-3. **Documentar, 30–45 s:** adjuntar el registro de pruebas y la versión del firmware. La ficha y la cadena de trazabilidad se completan con las acciones anteriores.
+1. **Puente de cristal:** tres preguntas con dos opciones. Una respuesta correcta permite avanzar por un cristal seguro. Una incorrecta rompe el cristal y elimina al jugador de ese nivel.
+2. **Tira de la cuerda:** cada acierto mueve la cuerda hacia el jugador; cada error la mueve hacia el rival. Dos puntos de ventaja deciden la victoria o derrota. Hay un máximo de cinco preguntas; si se llega al final o se acaba el tiempo, gana quien tenga ventaja. Un empate al acabar el tiempo no cuenta como victoria del jugador.
+3. **Luz roja, luz verde:** exactamente dos preguntas. Cada acierto permite avanzar y sobrevivir al giro de la muñeca. Un error provoca la eliminación en ese nivel.
 
-El recorrido correcto usa **14 acciones de juego**, además de escribir el nombre e iniciar. Las pistas son gratuitas y los errores se explican al momento. El reloj orienta, sin bloquear ni eliminar al participante. Los tiempos son estimaciones para clase, no un límite obligatorio.
+**Cada nivel dura como máximo 60 segundos de juego**, menos de 1:30. El reloj se detiene en la explicación y al cambiar de nivel. Aunque alguien pierda un nivel, puede continuar con el siguiente. No hay salas, cuentas ni multijugador.
 
-## Para compartir con el grupo
+## Puntuación
 
-Comparte este enlace de **GitHub Pages**:
+- **Cristales, 30 puntos:** 10 por respuesta correcta antes de terminar el nivel.
+- **Cuerda, 40 puntos:** ganar sin errores vale 40. Cada error reduce 10 puntos de esa victoria, con mínimo de 10. Al perder, se conservan 5 puntos por acierto, hasta 20.
+- **Muñeca, 30 puntos:** 15 por respuesta correcta.
+
+El máximo es 100 puntos. Al final aparecen nombre, puntuación total y resultado de cada nivel. Se puede descargar el resultado o guardarlo como PDF desde el diálogo de impresión. Los resultados no se envían automáticamente al docente.
+
+## Publicación
+
+GitHub Pages publica la rama `main`, carpeta `/ (root)`. Basta con actualizar los archivos de esa rama; no hay compilación ni dependencias. El enlace del juego es:
 
 https://alejandro117b.github.io/4.2-Solucion-y-Documentacion/
 
-La dirección `github.com/Alejandro117B/4.2-Solucion-y-Documentacion` muestra el código del repositorio. La dirección `alejandro117b.github.io/...` abre el juego. Cada compañero conserva su propia partida y resultado; no necesita crear una sala ni esperar a los demás.
+Los archivos necesarios son `index.html`, `styles.css`, `core.js`, `app.js` y `favicon.svg`. `.nojekyll` permite servirlos directamente. La carpeta completa también se puede abrir localmente con doble clic en `index.html`.
 
-## Publicación y actualizaciones
+## Datos y compatibilidad
 
-GitHub Pages se configura en **Settings → Pages → Deploy from a branch → main → / (root)**. Al actualizar los archivos de la rama `main`, Pages vuelve a publicar el sitio. No se necesita compilación ni servidor propio.
+El nombre, el progreso y el resultado se guardan solo en el navegador mediante `localStorage`, si está disponible. El reloj de un nivel continúa si se sale o se recarga durante la partida. Si el navegador bloquea el almacenamiento, se puede jugar manteniendo la página abierta. Esta versión usa un guardado distinto de las actividades anteriores.
 
-`index.html`, `styles.css`, `core.js`, `board.js`, `app.js` y `favicon.svg` deben permanecer juntos en la raíz. `.nojekyll` indica que los archivos se sirven directamente.
-
-Guía oficial: [configurar el origen de GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
-
-## Resultados
-
-Cada participante obtiene una puntuación de 100 posibles: reparar vale 40, comprobar 30 y documentar 30. Cada decisión incorrecta distinta resta 5 puntos, hasta la mitad del valor del reto. Repetir el mismo error no vuelve a penalizar. Las pistas, el tiempo y las pruebas no restan puntos.
-
-El resultado se descarga como texto, con nombre, tiempo, puntuación y bitácora técnica. También puede imprimirse o guardarse como PDF desde el navegador. **No hay recolección automática de resultados**: pide que entreguen el archivo o una captura por el medio que utilice tu grupo.
-
-## Funcionamiento
-
-- HTML, CSS y JavaScript estándar, sin frameworks ni dependencias externas.
-- Adaptado para computadora, tableta y teléfono. Interacciones por clic o toque.
-- Nombre y progreso guardados solo en el navegador mediante `localStorage`, cuando está disponible. Al recargar se puede continuar. La versión express utiliza un guardado separado de la versión larga anterior.
-- Si se bloquea el almacenamiento, se puede terminar manteniendo la página abierta.
-- El sonido del juego se representa visualmente; no requiere permiso de audio ni volumen activado en clase.
-- El nombre no es una identidad verificada. El resultado local sirve como actividad formativa, no como examen supervisado.
-- Los 85 °C de sustitución, la respuesta de 120 ms y el comportamiento del operador son simulados.
-- El enlace publicado necesita Internet al cargar. Como alternativa local, la carpeta completa se puede abrir con doble clic en `index.html`.
+Los dibujos son SVG y CSS, sin imágenes remotas ni permisos de audio. Funciona con clic o toque y se adapta a computadora y teléfono. Es una actividad formativa con resultado local, sin comprobación de identidad.
 
 ## Mantenimiento
 
-- `core.js`: motor de juego, estados, simulador, validación del guardado y puntuación.
-- `board.js`: ilustración vectorial del circuito.
-- `app.js`: interfaz, guardado local y descarga del resultado.
-- `styles.css`: diseño adaptable y estilos de impresión.
-- `tests.cjs`: comprobaciones del motor. Ejecutar `node tests.cjs` si se dispone de Node; los jugadores no lo necesitan.
-- `GUIA-DOCENTE.md`: introducción breve, soluciones y cierre de la actividad.
+`core.js` contiene las preguntas y reglas. `app.js` dibuja las escenas y maneja la interfaz. `styles.css` contiene el diseño. `node tests.cjs` ejecuta una revisión breve del recorrido y de las eliminaciones; los jugadores no necesitan Node.
