@@ -1,6 +1,6 @@
 # Protocolo 4.2 · Misión express
 
-**[Abrir el juego](https://alejandro117b.github.io/Es-el-4.2-Soluci-n-y-Documentaci-n/)**
+**[Abrir el juego](https://alejandro117b.github.io/4.2-Solucion-y-Documentacion/)**
 
 Actividad individual de aproximadamente **3 minutos**, basada en la presentación **4.2 Solución y documentación**, de Software Embebido. Cada participante abre el enlace, escribe su nombre y juega directamente en su navegador. No instala nada, no necesita cuenta de GitHub y no tiene que descargar el código.
 
@@ -16,9 +16,9 @@ El recorrido correcto usa **14 acciones de juego**, además de escribir el nombr
 
 Comparte este enlace de **GitHub Pages**:
 
-https://alejandro117b.github.io/Es-el-4.2-Soluci-n-y-Documentaci-n/
+https://alejandro117b.github.io/4.2-Solucion-y-Documentacion/
 
-La dirección `github.com/Alejandro117B/Es-el-4.2-Soluci-n-y-Documentaci-n` muestra el código del repositorio. La dirección `alejandro117b.github.io/...` abre el juego. Cada compañero conserva su propia partida y resultado; no necesita crear una sala ni esperar a los demás.
+La dirección `github.com/Alejandro117B/4.2-Solucion-y-Documentacion` muestra el código del repositorio. La dirección `alejandro117b.github.io/...` abre el juego. Cada compañero conserva su propia partida y resultado; no necesita crear una sala ni esperar a los demás.
 
 ## Publicación y actualizaciones
 

@@ -4,7 +4,7 @@
 
 > El monitor del laboratorio activa una alarma con datos inválidos. Abran el enlace, escriban su nombre y recuperen el sistema en tres retos: reparar, comprobar y documentar. Tienen unos tres minutos. Las pistas son gratuitas. Al final descarguen su resultado o tomen una captura para entregarla.
 
-Enlace: https://alejandro117b.github.io/Es-el-4.2-Soluci-n-y-Documentaci-n/
+Enlace: https://alejandro117b.github.io/4.2-Solucion-y-Documentacion/
 
 ## Distribución del tiempo
 
